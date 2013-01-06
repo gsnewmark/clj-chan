@@ -2,6 +2,7 @@
   "Entry point of an app - Ring handler."
   (:require [compojure.core :as c]
             [compojure.handler :as handler]
+            [compojure.route :as r]
             [liberator.core :as l]
             [liberator.representation :as lr]
             [cheshire.core :as j]
@@ -24,7 +25,7 @@
 ;; ## Views
 
 ;; Takes a list of Post instances as an argument.
-(h/deftemplate index "index.html"
+(h/deftemplate index "public/index.html"
   [posts]
   [:header]              (h/do->
                           (h/content "topic1"))
@@ -74,9 +75,11 @@
 ;; ## Routes
 
 (c/defroutes chan-routes
-  (c/ANY "/imageboard/posts"        [] posts-list)
-  (c/ANY "/imageboard/posts/create" [] create-post)
-  (c/ANY "/imageboard/posts/:id"    [] post))
+  (c/ANY       "/imageboard/posts"        [] posts-list)
+  (c/ANY       "/imageboard/posts/create" [] create-post)
+  (c/ANY       "/imageboard/posts/:id"    [] post)
+  (r/resources "/")
+  (r/not-found "Page not found"))
 
 ;; ## App's ring handler
 
