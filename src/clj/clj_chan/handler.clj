@@ -6,8 +6,24 @@
             [liberator.core :as l]
             [liberator.representation :as lr]
             [cheshire.core :as j]
-            [net.cgrand.enlive-html :as h]))
+            [net.cgrand.enlive-html :as h])
+  (:import [org.webbitserver WebServer WebServers WebSocketHandler])
+  (:gen-class :main true))
 
+
+;; Web socket
+
+(def csrv (WebServers/createWebServer 8008))
+(def channels (atom #{}))
+
+(.add csrv "/chatsocket"
+      (proxy [WebSocketHandler] []
+        (onOpen [c] (swap! channels conj c))
+        (onClose [c] (swap! channels disj c))
+        (onMessage [c j] (.send c j))))
+
+(defn -main [& m]
+  (.start csrv))
 
 ;; ## ~Model~
 
