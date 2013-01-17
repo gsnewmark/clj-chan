@@ -8,8 +8,3 @@
 
 (defn log [m] (.log js/console m))
 
-(defn init-ws
-  "Adds event handlers to a web socket from a map keys of which correspond
-to names of JS web socket API."
-  [ws handlers]
-  (dorun (map (fn [[n f]] (aset ws (name n) f)) handlers)))

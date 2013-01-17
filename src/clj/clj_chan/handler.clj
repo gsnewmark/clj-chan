@@ -11,32 +11,46 @@
   (:gen-class :main true))
 
 
-;; Web socket
-
-(def csrv (WebServers/createWebServer 8008))
-(def channels (atom #{}))
-
-(.add csrv "/chatsocket"
-      (proxy [WebSocketHandler] []
-        (onOpen [c] (swap! channels conj c))
-        (onClose [c] (swap! channels disj c))
-        (onMessage [c j] (.send c j))))
-
-(defn -main [& m]
-  (.start csrv))
-
 ;; ## ~Model~
 
 (defrecord Post [id author date content])
 
 (def posts "In-memory storage of posts." (atom #{}))
 
-(defn add-post [post]
+(defn add-post [post posts]
   "Add a post to a DB. Argument is a map with optional keys :author and
 :content."
-  (let [{:keys [author content] :or {author "Anon" content "sth"}} post]
-    (swap! posts conj (->Post (str (java.util.UUID/randomUUID))
-                              author (java.util.Date.) content))))
+  (let [{:keys [author content] :or {author "Anon" content "sth"}} post
+        post (->Post (str (java.util.UUID/randomUUID))
+                     author (java.util.Date.) content)]
+    (swap! posts conj post)
+    (dissoc post :id)))
+
+;; Web socket
+
+(def csrv (WebServers/createWebServer 8008))
+(def connections (atom #{}))
+
+(defn update-posts
+  "Updates a posts atom with a message and send it to all connections."
+  [message posts connections]
+  ;; TODO add some validation to message
+  (let [post (read-string message)]
+    (when (map? post)
+      (let [post (add-post post posts)]
+        (doseq [conn @connections] (.send conn (pr-str [post])))))))
+
+(.add csrv "/chatsocket"
+      (proxy [WebSocketHandler] []
+        (onOpen    [c]   (do
+                           (println @posts)
+                           (swap! connections conj c)
+                           (.send c (pr-str (map (partial into {}) @posts)))))
+        (onClose   [c]   (swap! connections disj c))
+        (onMessage [c m] (update-posts m posts connections))))
+
+(defn -main [& m]
+  (.start csrv))
 
 ;; ## Views
 
@@ -44,11 +58,7 @@
 (h/deftemplate index "public/index.html"
   [posts]
   [:header]              (h/do->
-                          (h/content "topic1"))
-  [:div#posts :div.post] (h/clone-for
-                          [post posts]
-                          [:div.author]  (h/content (:author post))
-                          [:div.content] (h/content (:content post))))
+                          (h/content "topic1")))
 
 ;; ## Resources
 
