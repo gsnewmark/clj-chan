@@ -26,8 +26,9 @@ Message is a vector of posts (Post record)."
 
 ;; ## Web socket connection
 
-;; TODO move connection string to env parameters
-(def ws (js/WebSocket. "ws://localhost:8008/chatsocket"))
+;; TODO move connection string to parameters
+;; TODO connect to correct socket (dependent on url)
+(def ws (js/WebSocket. "ws://localhost:1337/chat/hello"))
 
 (defn send-post
   [post]

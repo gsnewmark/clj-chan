@@ -29363,10 +29363,10 @@ goog.require("cljs.core");
 goog.require("cljs.reader");
 goog.require("clj_chan.client.utils");
 clj_chan.client.web_socket.init_ws = function init_ws(ws, handlers) {
-  return cljs.core.dorun.call(null, cljs.core.map.call(null, function(p__3739) {
-    var vec__3740 = p__3739;
-    var n = cljs.core.nth.call(null, vec__3740, 0, null);
-    var f = cljs.core.nth.call(null, vec__3740, 1, null);
+  return cljs.core.dorun.call(null, cljs.core.map.call(null, function(p__4887) {
+    var vec__4888 = p__4887;
+    var n = cljs.core.nth.call(null, vec__4888, 0, null);
+    var f = cljs.core.nth.call(null, vec__4888, 1, null);
     return ws[cljs.core.name.call(null, n)] = f
   }, handlers))
 };
@@ -29381,10 +29381,10 @@ clj_chan.client.web_socket.ws_handlers = cljs.core.ObjMap.fromObject(["\ufdd0'on
 }, "\ufdd0'onmessage":function ws_handlers(i) {
   var posts = clj_chan.client.web_socket.decode_posts.call(null, i);
   return clj_chan.client.utils.log.call(null, i.data)
-}, "\ufdd0'onerror":function ws_handlers(p1__3741_SHARP_) {
-  return clj_chan.client.utils.log.call(null, [cljs.core.str("Something bad happened:"), cljs.core.str(p1__3741_SHARP_)].join(""))
+}, "\ufdd0'onerror":function ws_handlers(p1__4889_SHARP_) {
+  return clj_chan.client.utils.log.call(null, [cljs.core.str("Something bad happened:"), cljs.core.str(p1__4889_SHARP_)].join(""))
 }});
-clj_chan.client.web_socket.ws = new WebSocket("ws://localhost:8008/chatsocket");
+clj_chan.client.web_socket.ws = new WebSocket("ws://localhost:1337/chat/hello");
 clj_chan.client.web_socket.send_post = function send_post(post) {
   return clj_chan.client.web_socket.ws.send(cljs.core.pr_str.call(null, post))
 };
@@ -35474,19 +35474,19 @@ clj_chan.client.board.read_new_post_data = function read_new_post_data() {
 };
 clj_chan.client.board.setup = function setup() {
   return enfocus.core.at.call(null, document, cljs.core.PersistentVector.fromArray(["#post-submit"], true), enfocus.core.en_listen.call(null, "\ufdd0'click", function() {
-    return clj_chan.client.web_socket.send_post.call(null, clj_chan.client.board.read_new_post_data.call(null))
+    return clj_chan.client.web_socket.send_post.call(null, cljs.core.PersistentVector.fromArray([clj_chan.client.board.read_new_post_data.call(null)], true))
   }))
 };
 clj_chan.client.board.start = function start() {
   clj_chan.client.web_socket.init_ws.call(null, clj_chan.client.web_socket.ws, cljs.core.assoc.call(null, clj_chan.client.web_socket.ws_handlers, "\ufdd0'onmessage", function(i) {
     var posts = clj_chan.client.web_socket.decode_posts.call(null, i);
-    var G__3347 = cljs.core.seq.call(null, posts);
+    var G__8281 = cljs.core.seq.call(null, posts);
     while(true) {
-      if(G__3347) {
-        var post = cljs.core.first.call(null, G__3347);
+      if(G__8281) {
+        var post = cljs.core.first.call(null, G__8281);
         clj_chan.client.board.show_post.call(null, post);
-        var G__3348 = cljs.core.next.call(null, G__3347);
-        G__3347 = G__3348;
+        var G__8282 = cljs.core.next.call(null, G__8281);
+        G__8281 = G__8282;
         continue
       }else {
         return null

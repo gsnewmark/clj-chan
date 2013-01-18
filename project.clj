@@ -5,7 +5,7 @@
                  :url  "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure     "1.5.0-RC2"]
                  [compojure               "1.1.3"]
-                 [org.webbitserver/webbit "0.4.6"]
+                 [aleph                   "0.3.0-SNAPSHOT"]
                  [enfocus                 "1.0.0-beta2"]]
   :main         clj-chan.handler
   :ring         {:handler clj-chan.handler/app}

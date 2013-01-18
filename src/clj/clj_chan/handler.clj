@@ -2,9 +2,9 @@
   "Entry point of an app - Ring handler."
   (:require [compojure.core :as c]
             [compojure.handler :as handler]
-            [compojure.route :as r])
-  (:import [org.webbitserver WebServer WebServers WebSocketHandler])
-  (:gen-class :main true))
+            [compojure.route :as r]
+            [lamina.core :as lc]
+            [aleph.http :as ah]))
 
 
 ;; ## ~Model~
@@ -22,38 +22,46 @@
     (swap! posts conj post)
     (dissoc post :id)))
 
-;; ## Web socket
+;; ## Aleph web socket (based on http://alexkehayias.tumblr.com/post/28783286946/a-simple-real-time-chat-server-using-clojure-and-aleph)
 
-(def csrv (WebServers/createWebServer 8008))
-(def connections (atom #{}))
+;; TODO debug post adding
+(defn chat-init [ch]
+  (lc/receive-all ch #(doseq [post %] (add-post post posts))))
 
-(defn update-posts
-  "Updates a posts atom with a message and send it to all connections."
-  [message posts connections]
-  ;; TODO add some validation to message
-  (let [post (read-string message)]
-    (when (map? post)
-      (let [post (add-post post posts)]
-        (doseq [conn @connections] (.send conn (pr-str [post])))))))
+;; TODO send back correct post (result from add-post)
+(defn chat-handler [ch room]
+  (let [chat (lc/named-channel room chat-init)]
+    (println (pr-str (map (partial into {}) @posts)))
+    ;; send 'history' to user
+    ;; TODO find a way to send a history of messages to a newly connected user
+    (lc/siphon (lc/channel (pr-str (map (partial into {}) @posts))) ch)
+    ;; send subsequent messages from web socket to user
+    (lc/siphon chat ch)
+    ;; send subsequent messages (including this one) from user to web socket
+    (lc/siphon ch chat)))
 
-(.add csrv "/chatsocket"
-      (proxy [WebSocketHandler] []
-        (onOpen    [c]   (do
-                           (swap! connections conj c)
-                           (.send c (pr-str (map (partial into {}) @posts)))))
-        (onClose   [c]   (swap! connections disj c))
-        (onMessage [c m] (update-posts m posts connections))))
+(defn app [request]
+  {:status 200
+   :headers {"content-type" "text/html"}
+   :body "<script type=\"text/javascript\" src=\"/hello.js\"></script><b>oi</b>"})
 
-(defn -main [& m]
-  (.start csrv))
+(defn chat [ch request]
+  (let [params (:route-params request)
+        room (:room params)]
+      (if (:websocket request)
+        (chat-handler ch room)
+        (lc/enqueue ch (app request)))))
 
-;; ## Routes
-
-(c/defroutes chan-routes
+(c/defroutes app-routes
+  (c/GET ["/"] {} "Hello world!")
+  (c/GET ["/chat/:room", :room #"[a-zA-Z]+"] {}
+       (ah/wrap-aleph-handler chat))
   (r/resources "/")
+  ;;Any url without a route handler will be served this response
   (r/not-found "Page not found"))
 
-;; ## App's ring handler
-
-(def app
-  (handler/site chan-routes))
+(defn -main [& args]
+  "Main thread for the server which starts an async server with
+  all the routes we specified and is websocket ready."
+  (ah/start-http-server (ah/wrap-ring-handler app-routes)
+                        {:port 1337 :websocket true}))

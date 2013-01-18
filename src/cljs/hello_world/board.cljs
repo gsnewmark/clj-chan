@@ -22,7 +22,7 @@
            :content ["#new-post > #new-content"] (em/get-prop :value)))
 
 (em/defaction setup []
-  ["#post-submit"] (em/listen :click #(socket/send-post (read-new-post-data))))
+  ["#post-submit"] (em/listen :click #(socket/send-post [(read-new-post-data)])))
 
 (defn start []
   (socket/init-ws socket/ws
