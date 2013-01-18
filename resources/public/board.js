@@ -29363,10 +29363,10 @@ goog.require("cljs.core");
 goog.require("cljs.reader");
 goog.require("clj_chan.client.utils");
 clj_chan.client.web_socket.init_ws = function init_ws(ws, handlers) {
-  return cljs.core.dorun.call(null, cljs.core.map.call(null, function(p__4887) {
-    var vec__4888 = p__4887;
-    var n = cljs.core.nth.call(null, vec__4888, 0, null);
-    var f = cljs.core.nth.call(null, vec__4888, 1, null);
+  return cljs.core.dorun.call(null, cljs.core.map.call(null, function(p__3366) {
+    var vec__3367 = p__3366;
+    var n = cljs.core.nth.call(null, vec__3367, 0, null);
+    var f = cljs.core.nth.call(null, vec__3367, 1, null);
     return ws[cljs.core.name.call(null, n)] = f
   }, handlers))
 };
@@ -29381,10 +29381,10 @@ clj_chan.client.web_socket.ws_handlers = cljs.core.ObjMap.fromObject(["\ufdd0'on
 }, "\ufdd0'onmessage":function ws_handlers(i) {
   var posts = clj_chan.client.web_socket.decode_posts.call(null, i);
   return clj_chan.client.utils.log.call(null, i.data)
-}, "\ufdd0'onerror":function ws_handlers(p1__4889_SHARP_) {
-  return clj_chan.client.utils.log.call(null, [cljs.core.str("Something bad happened:"), cljs.core.str(p1__4889_SHARP_)].join(""))
+}, "\ufdd0'onerror":function ws_handlers(p1__3368_SHARP_) {
+  return clj_chan.client.utils.log.call(null, [cljs.core.str("Something bad happened:"), cljs.core.str(p1__3368_SHARP_)].join(""))
 }});
-clj_chan.client.web_socket.ws = new WebSocket("ws://localhost:1337/chat/hello");
+clj_chan.client.web_socket.ws = new WebSocket("ws://localhost:1337/boards/hello");
 clj_chan.client.web_socket.send_post = function send_post(post) {
   return clj_chan.client.web_socket.ws.send(cljs.core.pr_str.call(null, post))
 };
@@ -35466,9 +35466,9 @@ clj_chan.client.board.show_post = function show_post(post) {
   return enfocus.core.at.call(null, document, cljs.core.PersistentVector.fromArray(["div#posts > div#post-anchor"], true), enfocus.core.en_after.call(null, clj_chan.client.board.gen_post_html.call(null, post)))
 };
 clj_chan.client.board.read_new_post_data = function read_new_post_data() {
-  return enfocus.core.from.call(null, document, "\ufdd0'author", cljs.core.PersistentVector.fromArray(["#new-post > #new-author"], true), enfocus.core.extr_multi_node.call(null, function(pnod__3248__auto__) {
+  return enfocus.core.from.call(null, document, "\ufdd0'author", cljs.core.PersistentVector.fromArray(["#new-post #new-author"], true), enfocus.core.extr_multi_node.call(null, function(pnod__3248__auto__) {
     return pnod__3248__auto__.value
-  }), "\ufdd0'content", cljs.core.PersistentVector.fromArray(["#new-post > #new-content"], true), enfocus.core.extr_multi_node.call(null, function(pnod__3248__auto__) {
+  }), "\ufdd0'content", cljs.core.PersistentVector.fromArray(["#new-post #new-content"], true), enfocus.core.extr_multi_node.call(null, function(pnod__3248__auto__) {
     return pnod__3248__auto__.value
   }))
 };
@@ -35480,13 +35480,13 @@ clj_chan.client.board.setup = function setup() {
 clj_chan.client.board.start = function start() {
   clj_chan.client.web_socket.init_ws.call(null, clj_chan.client.web_socket.ws, cljs.core.assoc.call(null, clj_chan.client.web_socket.ws_handlers, "\ufdd0'onmessage", function(i) {
     var posts = clj_chan.client.web_socket.decode_posts.call(null, i);
-    var G__8281 = cljs.core.seq.call(null, posts);
+    var G__3731 = cljs.core.seq.call(null, posts);
     while(true) {
-      if(G__8281) {
-        var post = cljs.core.first.call(null, G__8281);
+      if(G__3731) {
+        var post = cljs.core.first.call(null, G__3731);
         clj_chan.client.board.show_post.call(null, post);
-        var G__8282 = cljs.core.next.call(null, G__8281);
-        G__8281 = G__8282;
+        var G__3732 = cljs.core.next.call(null, G__3731);
+        G__3731 = G__3732;
         continue
       }else {
         return null

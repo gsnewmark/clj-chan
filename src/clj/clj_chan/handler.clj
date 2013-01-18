@@ -3,6 +3,8 @@
   (:require [compojure.core :as c]
             [compojure.handler :as handler]
             [compojure.route :as r]
+            [hiccup.page :as hp]
+            [hiccup.form :as hf]
             [lamina.core :as lc]
             [aleph.http :as ah]))
 
@@ -34,34 +36,45 @@
     (println (pr-str (map (partial into {}) @posts)))
     ;; send 'history' to user
     ;; TODO find a way to send a history of messages to a newly connected user
-    (lc/siphon (lc/channel (pr-str (map (partial into {}) @posts))) ch)
+    ;(lc/siphon (lc/channel (pr-str (map (partial into {}) @posts))) ch)
     ;; send subsequent messages from web socket to user
     (lc/siphon chat ch)
     ;; send subsequent messages (including this one) from user to web socket
     (lc/siphon ch chat)))
 
-(defn app [request]
-  {:status 200
-   :headers {"content-type" "text/html"}
-   :body "<script type=\"text/javascript\" src=\"/hello.js\"></script><b>oi</b>"})
+;; ## Web views
 
-(defn chat [ch request]
-  (let [params (:route-params request)
-        room (:room params)]
-      (if (:websocket request)
-        (chat-handler ch room)
-        (lc/enqueue ch (app request)))))
+(defn board
+  "HTML base for a specific board."
+  [topic]
+  (hp/html5
+   [:head [:title (str "Best chan ever - /" topic)]]
+   [:body
+    (hp/include-js "/board.js")
+    [:header topic]
+    [:div#new-post
+     [:div (hf/text-field {:id "new-author"} "new-author")]
+     [:div (hf/text-area {:id "new-content" :autofocus true} "new-content")]
+     [:div (hf/submit-button {:id "post-submit"} "Add post")]]
+    [:hr]
+    [:div#posts [:div#post-anchor]]]))
+
+(defn app [request]
+  {:status  200
+   :headers {"content-type" "text/html"}
+   :body    (board (get-in request [:route-params :topic] "/b"))})
+
+(defn board-app [ch request]
+  (if (:websocket request)
+    (chat-handler ch (get-in request [:route-params :topic] "/b"))
+    (lc/enqueue ch (app request))))
 
 (c/defroutes app-routes
-  (c/GET ["/"] {} "Hello world!")
-  (c/GET ["/chat/:room", :room #"[a-zA-Z]+"] {}
-       (ah/wrap-aleph-handler chat))
+  (c/GET ["/boards/:topic", :topic #"[a-zA-Z0-9_\-]+"] {}
+       (ah/wrap-aleph-handler board-app))
   (r/resources "/")
-  ;;Any url without a route handler will be served this response
   (r/not-found "Page not found"))
 
 (defn -main [& args]
-  "Main thread for the server which starts an async server with
-  all the routes we specified and is websocket ready."
   (ah/start-http-server (ah/wrap-ring-handler app-routes)
                         {:port 1337 :websocket true}))

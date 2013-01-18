@@ -18,8 +18,8 @@
 
 (defn read-new-post-data []
   (em/from js/document
-           :author ["#new-post > #new-author"] (em/get-prop :value)
-           :content ["#new-post > #new-content"] (em/get-prop :value)))
+           :author ["#new-post #new-author"] (em/get-prop :value)
+           :content ["#new-post #new-content"] (em/get-prop :value)))
 
 (em/defaction setup []
   ["#post-submit"] (em/listen :click #(socket/send-post [(read-new-post-data)])))
