@@ -16,12 +16,12 @@ WebSocket handling.
 compiler).
 3. Execute
 
-    lein deps
-    lein cljsbuild once
+        lein deps
+        lein cljsbuild once
 
 4. If you want to create a jar, execute
 
-   lein uberjar
+        lein uberjar
 
 This will create runnable jar called `clj-chan-0.1.0-SNAPSHOT-standalone.jar`
 in a `<checkout_dir>/targer` directory.
@@ -30,7 +30,7 @@ in a `<checkout_dir>/targer` directory.
 
 If you created jar, run
 
-    java -jar clj-chan-0.1.0-SNAPSHOT-standalone.jar
+        java -jar clj-chan-0.1.0-SNAPSHOT-standalone.jar
 
 Or simply execute `lein run` in a `<checkout_dir>`.
 
