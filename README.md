@@ -1,6 +1,6 @@
 # clj-chan
 
-A simple imageboard.
+A simple imageboard with dynamic post loading.
 
 ## Installation
 

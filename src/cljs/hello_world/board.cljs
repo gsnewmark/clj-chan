@@ -1,34 +1,47 @@
 (ns clj-chan.client.board
+  "Defines main operations with a specific board's page."
   (:require        [clj-chan.client.web-socket :as socket]
                    [clj-chan.client.utils :as u]
-                   [enfocus.core :as ef])
+                   [enfocus.core :as ef]
+                   [dommy.template :as t])
   (:require-macros [enfocus.macros :as em]))
 
+(defn gen-post-html
+  "Generates a DOM element which contains post."
+  [post]
+  (let [{author :author image :image text :text} post]
+    (t/node
+    [:div.post
+     [:div.post-author author]
+     [:div.post-image
+      [:a {:href image :target "_blank"}
+       [:img {:src image :alt "some pic"}]]]
+     [:div.post-text text]
+     [:hr]])))
 
-;; TODO close web socket connection when page is closed
-
-(defn gen-post-html [post]
-  (str "<div><div class=\"post-author\">" (:author post) "</div>"
-       "<div class=\"post-content\">" (:content post) "<hr></div></div>"))
-
-(defn show-post [post]
+(defn show-post
+  "Adds a new post."
+  [post]
   (em/at js/document
          ["div#posts > div#post-anchor"]
          (em/after (gen-post-html post))))
 
 (defn read-new-post-data []
-  (em/from js/document
-           :author ["#new-post #new-author"] (em/get-prop :value)
-           :content ["#new-post #new-content"] (em/get-prop :value)))
+  (let [post (em/from js/document
+                      :author ["#new-post #new-author"] (em/get-prop :value)
+                      :image ["#new-post #new-image"] (em/get-prop :value)
+                      :text ["#new-post #new-text"] (em/get-prop :value))]
+    (into {} (filter #(not ((comp empty? second) %)) post))))
 
 (em/defaction setup []
-  ["#post-submit"] (em/listen :click #(socket/send-post [(read-new-post-data)])))
+  ["#post-submit"]
+  (em/listen :click #(socket/send-post (read-new-post-data))))
 
 (defn start []
   (socket/init-ws socket/ws
                   (assoc socket/ws-handlers :onmessage
-                         (fn [i] (let [posts (socket/decode-posts i)]
-                                  (doseq [post posts] (show-post post))))))
+                         (fn [i] (let [post (socket/decode-post i)]
+                                  (show-post post)))))
   (setup))
 
 (set! (.-onload js/window) #(start))

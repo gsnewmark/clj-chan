@@ -21086,6 +21086,179 @@ cljs.core.UUID.prototype.toString = function() {
   var this$ = this;
   return cljs.core.pr_str.call(null, this$)
 };
+goog.provide("clojure.string");
+goog.require("cljs.core");
+goog.require("goog.string.StringBuffer");
+goog.require("goog.string");
+clojure.string.seq_reverse = function seq_reverse(coll) {
+  return cljs.core.reduce.call(null, cljs.core.conj, cljs.core.List.EMPTY, coll)
+};
+clojure.string.reverse = function reverse(s) {
+  return s.split("").reverse().join("")
+};
+clojure.string.replace = function replace(s, match, replacement) {
+  if(cljs.core.string_QMARK_.call(null, match)) {
+    return s.replace(new RegExp(goog.string.regExpEscape(match), "g"), replacement)
+  }else {
+    if(cljs.core.truth_(match.hasOwnProperty("source"))) {
+      return s.replace(new RegExp(match.source, "g"), replacement)
+    }else {
+      if("\ufdd0'else") {
+        throw[cljs.core.str("Invalid match arg: "), cljs.core.str(match)].join("");
+      }else {
+        return null
+      }
+    }
+  }
+};
+clojure.string.replace_first = function replace_first(s, match, replacement) {
+  return s.replace(match, replacement)
+};
+clojure.string.join = function() {
+  var join = null;
+  var join__1 = function(coll) {
+    return cljs.core.apply.call(null, cljs.core.str, coll)
+  };
+  var join__2 = function(separator, coll) {
+    return cljs.core.apply.call(null, cljs.core.str, cljs.core.interpose.call(null, separator, coll))
+  };
+  join = function(separator, coll) {
+    switch(arguments.length) {
+      case 1:
+        return join__1.call(this, separator);
+      case 2:
+        return join__2.call(this, separator, coll)
+    }
+    throw new Error("Invalid arity: " + arguments.length);
+  };
+  join.cljs$lang$arity$1 = join__1;
+  join.cljs$lang$arity$2 = join__2;
+  return join
+}();
+clojure.string.upper_case = function upper_case(s) {
+  return s.toUpperCase()
+};
+clojure.string.lower_case = function lower_case(s) {
+  return s.toLowerCase()
+};
+clojure.string.capitalize = function capitalize(s) {
+  if(cljs.core.count.call(null, s) < 2) {
+    return clojure.string.upper_case.call(null, s)
+  }else {
+    return[cljs.core.str(clojure.string.upper_case.call(null, cljs.core.subs.call(null, s, 0, 1))), cljs.core.str(clojure.string.lower_case.call(null, cljs.core.subs.call(null, s, 1)))].join("")
+  }
+};
+clojure.string.split = function() {
+  var split = null;
+  var split__2 = function(s, re) {
+    return cljs.core.vec.call(null, [cljs.core.str(s)].join("").split(re))
+  };
+  var split__3 = function(s, re, limit) {
+    if(limit < 1) {
+      return cljs.core.vec.call(null, [cljs.core.str(s)].join("").split(re))
+    }else {
+      var s__$1 = s;
+      var limit__$1 = limit;
+      var parts = cljs.core.PersistentVector.EMPTY;
+      while(true) {
+        if(cljs.core._EQ_.call(null, limit__$1, 1)) {
+          return cljs.core.conj.call(null, parts, s__$1)
+        }else {
+          var temp__4109__auto__ = cljs.core.re_find.call(null, re, s__$1);
+          if(cljs.core.truth_(temp__4109__auto__)) {
+            var m = temp__4109__auto__;
+            var index = s__$1.indexOf(m);
+            var G__4295 = s__$1.substring(index + cljs.core.count.call(null, m));
+            var G__4296 = limit__$1 - 1;
+            var G__4297 = cljs.core.conj.call(null, parts, s__$1.substring(0, index));
+            s__$1 = G__4295;
+            limit__$1 = G__4296;
+            parts = G__4297;
+            continue
+          }else {
+            return cljs.core.conj.call(null, parts, s__$1)
+          }
+        }
+        break
+      }
+    }
+  };
+  split = function(s, re, limit) {
+    switch(arguments.length) {
+      case 2:
+        return split__2.call(this, s, re);
+      case 3:
+        return split__3.call(this, s, re, limit)
+    }
+    throw new Error("Invalid arity: " + arguments.length);
+  };
+  split.cljs$lang$arity$2 = split__2;
+  split.cljs$lang$arity$3 = split__3;
+  return split
+}();
+clojure.string.split_lines = function split_lines(s) {
+  return clojure.string.split.call(null, s, /\n|\r\n/)
+};
+clojure.string.trim = function trim(s) {
+  return goog.string.trim(s)
+};
+clojure.string.triml = function triml(s) {
+  return goog.string.trimLeft(s)
+};
+clojure.string.trimr = function trimr(s) {
+  return goog.string.trimRight(s)
+};
+clojure.string.trim_newline = function trim_newline(s) {
+  var index = s.length;
+  while(true) {
+    if(index === 0) {
+      return""
+    }else {
+      var ch = cljs.core._lookup.call(null, s, index - 1, null);
+      if(function() {
+        var or__3962__auto__ = cljs.core._EQ_.call(null, ch, "\n");
+        if(or__3962__auto__) {
+          return or__3962__auto__
+        }else {
+          return cljs.core._EQ_.call(null, ch, "\r")
+        }
+      }()) {
+        var G__4298 = index - 1;
+        index = G__4298;
+        continue
+      }else {
+        return s.substring(0, index)
+      }
+    }
+    break
+  }
+};
+clojure.string.blank_QMARK_ = function blank_QMARK_(s) {
+  return goog.string.isEmptySafe(s)
+};
+clojure.string.escape = function escape(s, cmap) {
+  var buffer = new goog.string.StringBuffer;
+  var length = s.length;
+  var index = 0;
+  while(true) {
+    if(cljs.core._EQ_.call(null, length, index)) {
+      return buffer.toString()
+    }else {
+      var ch = s.charAt(index);
+      var temp__4109__auto___4299 = cljs.core._lookup.call(null, cmap, ch, null);
+      if(cljs.core.truth_(temp__4109__auto___4299)) {
+        var replacement_4300 = temp__4109__auto___4299;
+        buffer.append([cljs.core.str(replacement_4300)].join(""))
+      }else {
+        buffer.append(ch)
+      }
+      var G__4301 = index + 1;
+      index = G__4301;
+      continue
+    }
+    break
+  }
+};
 goog.provide("goog.userAgent");
 goog.require("goog.string");
 goog.userAgent.ASSUME_IE = false;
@@ -29360,19 +29533,22 @@ cljs.reader.deregister_tag_parser_BANG_ = function deregister_tag_parser_BANG_(t
 };
 goog.provide("clj_chan.client.web_socket");
 goog.require("cljs.core");
+goog.require("clojure.string");
 goog.require("cljs.reader");
 goog.require("clj_chan.client.utils");
 clj_chan.client.web_socket.init_ws = function init_ws(ws, handlers) {
-  return cljs.core.dorun.call(null, cljs.core.map.call(null, function(p__3366) {
-    var vec__3367 = p__3366;
-    var n = cljs.core.nth.call(null, vec__3367, 0, null);
-    var f = cljs.core.nth.call(null, vec__3367, 1, null);
+  return cljs.core.dorun.call(null, cljs.core.map.call(null, function(p__3776) {
+    var vec__3777 = p__3776;
+    var n = cljs.core.nth.call(null, vec__3777, 0, null);
+    var f = cljs.core.nth.call(null, vec__3777, 1, null);
     return ws[cljs.core.name.call(null, n)] = f
   }, handlers))
 };
-clj_chan.client.web_socket.messages = cljs.core.atom.call(null, cljs.core.PersistentVector.EMPTY);
-clj_chan.client.web_socket.decode_posts = function decode_posts(posts_string) {
-  return cljs.reader.read_string.call(null, posts_string.data)
+clj_chan.client.web_socket.decode_post = function decode_post(post_event) {
+  return cljs.reader.read_string.call(null, post_event.data)
+};
+clj_chan.client.web_socket.send_post = function send_post(post) {
+  return clj_chan.client.web_socket.ws.send(cljs.core.pr_str.call(null, post))
 };
 clj_chan.client.web_socket.ws_handlers = cljs.core.ObjMap.fromObject(["\ufdd0'onopen", "\ufdd0'onclose", "\ufdd0'onmessage", "\ufdd0'onerror"], {"\ufdd0'onopen":function ws_handlers() {
   return clj_chan.client.utils.log.call(null, "Connection established.")
@@ -29381,13 +29557,10 @@ clj_chan.client.web_socket.ws_handlers = cljs.core.ObjMap.fromObject(["\ufdd0'on
 }, "\ufdd0'onmessage":function ws_handlers(i) {
   var posts = clj_chan.client.web_socket.decode_posts.call(null, i);
   return clj_chan.client.utils.log.call(null, i.data)
-}, "\ufdd0'onerror":function ws_handlers(p1__3368_SHARP_) {
-  return clj_chan.client.utils.log.call(null, [cljs.core.str("Something bad happened:"), cljs.core.str(p1__3368_SHARP_)].join(""))
+}, "\ufdd0'onerror":function ws_handlers(p1__3778_SHARP_) {
+  return clj_chan.client.utils.log.call(null, [cljs.core.str("Something bad happened:"), cljs.core.str(p1__3778_SHARP_)].join(""))
 }});
-clj_chan.client.web_socket.ws = new WebSocket("ws://localhost:1337/boards/hello");
-clj_chan.client.web_socket.send_post = function send_post(post) {
-  return clj_chan.client.web_socket.ws.send(cljs.core.pr_str.call(null, post))
-};
+clj_chan.client.web_socket.ws = new WebSocket(clojure.string.replace_first.call(null, [cljs.core.str(window.location)].join(""), /[^\/]+/, "ws:"));
 goog.provide("goog.fx.Animation");
 goog.provide("goog.fx.Animation.EventType");
 goog.provide("goog.fx.Animation.State");
@@ -32463,179 +32636,6 @@ goog.dom.forms.setSelectMultiple_ = function(el, opt_value) {
     }
   }
 };
-goog.provide("clojure.string");
-goog.require("cljs.core");
-goog.require("goog.string.StringBuffer");
-goog.require("goog.string");
-clojure.string.seq_reverse = function seq_reverse(coll) {
-  return cljs.core.reduce.call(null, cljs.core.conj, cljs.core.List.EMPTY, coll)
-};
-clojure.string.reverse = function reverse(s) {
-  return s.split("").reverse().join("")
-};
-clojure.string.replace = function replace(s, match, replacement) {
-  if(cljs.core.string_QMARK_.call(null, match)) {
-    return s.replace(new RegExp(goog.string.regExpEscape(match), "g"), replacement)
-  }else {
-    if(cljs.core.truth_(match.hasOwnProperty("source"))) {
-      return s.replace(new RegExp(match.source, "g"), replacement)
-    }else {
-      if("\ufdd0'else") {
-        throw[cljs.core.str("Invalid match arg: "), cljs.core.str(match)].join("");
-      }else {
-        return null
-      }
-    }
-  }
-};
-clojure.string.replace_first = function replace_first(s, match, replacement) {
-  return s.replace(match, replacement)
-};
-clojure.string.join = function() {
-  var join = null;
-  var join__1 = function(coll) {
-    return cljs.core.apply.call(null, cljs.core.str, coll)
-  };
-  var join__2 = function(separator, coll) {
-    return cljs.core.apply.call(null, cljs.core.str, cljs.core.interpose.call(null, separator, coll))
-  };
-  join = function(separator, coll) {
-    switch(arguments.length) {
-      case 1:
-        return join__1.call(this, separator);
-      case 2:
-        return join__2.call(this, separator, coll)
-    }
-    throw new Error("Invalid arity: " + arguments.length);
-  };
-  join.cljs$lang$arity$1 = join__1;
-  join.cljs$lang$arity$2 = join__2;
-  return join
-}();
-clojure.string.upper_case = function upper_case(s) {
-  return s.toUpperCase()
-};
-clojure.string.lower_case = function lower_case(s) {
-  return s.toLowerCase()
-};
-clojure.string.capitalize = function capitalize(s) {
-  if(cljs.core.count.call(null, s) < 2) {
-    return clojure.string.upper_case.call(null, s)
-  }else {
-    return[cljs.core.str(clojure.string.upper_case.call(null, cljs.core.subs.call(null, s, 0, 1))), cljs.core.str(clojure.string.lower_case.call(null, cljs.core.subs.call(null, s, 1)))].join("")
-  }
-};
-clojure.string.split = function() {
-  var split = null;
-  var split__2 = function(s, re) {
-    return cljs.core.vec.call(null, [cljs.core.str(s)].join("").split(re))
-  };
-  var split__3 = function(s, re, limit) {
-    if(limit < 1) {
-      return cljs.core.vec.call(null, [cljs.core.str(s)].join("").split(re))
-    }else {
-      var s__$1 = s;
-      var limit__$1 = limit;
-      var parts = cljs.core.PersistentVector.EMPTY;
-      while(true) {
-        if(cljs.core._EQ_.call(null, limit__$1, 1)) {
-          return cljs.core.conj.call(null, parts, s__$1)
-        }else {
-          var temp__4109__auto__ = cljs.core.re_find.call(null, re, s__$1);
-          if(cljs.core.truth_(temp__4109__auto__)) {
-            var m = temp__4109__auto__;
-            var index = s__$1.indexOf(m);
-            var G__4295 = s__$1.substring(index + cljs.core.count.call(null, m));
-            var G__4296 = limit__$1 - 1;
-            var G__4297 = cljs.core.conj.call(null, parts, s__$1.substring(0, index));
-            s__$1 = G__4295;
-            limit__$1 = G__4296;
-            parts = G__4297;
-            continue
-          }else {
-            return cljs.core.conj.call(null, parts, s__$1)
-          }
-        }
-        break
-      }
-    }
-  };
-  split = function(s, re, limit) {
-    switch(arguments.length) {
-      case 2:
-        return split__2.call(this, s, re);
-      case 3:
-        return split__3.call(this, s, re, limit)
-    }
-    throw new Error("Invalid arity: " + arguments.length);
-  };
-  split.cljs$lang$arity$2 = split__2;
-  split.cljs$lang$arity$3 = split__3;
-  return split
-}();
-clojure.string.split_lines = function split_lines(s) {
-  return clojure.string.split.call(null, s, /\n|\r\n/)
-};
-clojure.string.trim = function trim(s) {
-  return goog.string.trim(s)
-};
-clojure.string.triml = function triml(s) {
-  return goog.string.trimLeft(s)
-};
-clojure.string.trimr = function trimr(s) {
-  return goog.string.trimRight(s)
-};
-clojure.string.trim_newline = function trim_newline(s) {
-  var index = s.length;
-  while(true) {
-    if(index === 0) {
-      return""
-    }else {
-      var ch = cljs.core._lookup.call(null, s, index - 1, null);
-      if(function() {
-        var or__3962__auto__ = cljs.core._EQ_.call(null, ch, "\n");
-        if(or__3962__auto__) {
-          return or__3962__auto__
-        }else {
-          return cljs.core._EQ_.call(null, ch, "\r")
-        }
-      }()) {
-        var G__4298 = index - 1;
-        index = G__4298;
-        continue
-      }else {
-        return s.substring(0, index)
-      }
-    }
-    break
-  }
-};
-clojure.string.blank_QMARK_ = function blank_QMARK_(s) {
-  return goog.string.isEmptySafe(s)
-};
-clojure.string.escape = function escape(s, cmap) {
-  var buffer = new goog.string.StringBuffer;
-  var length = s.length;
-  var index = 0;
-  while(true) {
-    if(cljs.core._EQ_.call(null, length, index)) {
-      return buffer.toString()
-    }else {
-      var ch = s.charAt(index);
-      var temp__4109__auto___4299 = cljs.core._lookup.call(null, cmap, ch, null);
-      if(cljs.core.truth_(temp__4109__auto___4299)) {
-        var replacement_4300 = temp__4109__auto___4299;
-        buffer.append([cljs.core.str(replacement_4300)].join(""))
-      }else {
-        buffer.append(ch)
-      }
-      var G__4301 = index + 1;
-      index = G__4301;
-      continue
-    }
-    break
-  }
-};
 goog.provide("domina");
 goog.require("cljs.core");
 goog.require("domina.support");
@@ -33712,6 +33712,241 @@ domina.css.sel = function() {
   sel.cljs$lang$arity$2 = sel__2;
   return sel
 }();
+goog.provide("dommy.template");
+goog.require("cljs.core");
+goog.require("clojure.string");
+dommy.template.add_class_BANG_ = function add_class_BANG_(node, c) {
+  return node.setAttribute("class", function() {
+    var temp__4109__auto__ = node.getAttribute("class");
+    if(cljs.core.truth_(temp__4109__auto__)) {
+      var cur_c = temp__4109__auto__;
+      return[cljs.core.str(cur_c), cljs.core.str(" "), cljs.core.str(c)].join("")
+    }else {
+      return c
+    }
+  }())
+};
+dommy.template.style_str = function style_str(m) {
+  return clojure.string.join.call(null, " ", cljs.core.map.call(null, function(p__3379) {
+    var vec__3380 = p__3379;
+    var k = cljs.core.nth.call(null, vec__3380, 0, null);
+    var v = cljs.core.nth.call(null, vec__3380, 1, null);
+    return[cljs.core.str(cljs.core.name.call(null, k)), cljs.core.str(":"), cljs.core.str(cljs.core.name.call(null, v)), cljs.core.str(";")].join("")
+  }, m))
+};
+dommy.template.add_attrs_BANG_ = function add_attrs_BANG_(node, attrs) {
+  var G__3385 = cljs.core.seq.call(null, attrs);
+  while(true) {
+    if(G__3385) {
+      var vec__3386 = cljs.core.first.call(null, G__3385);
+      var k = cljs.core.nth.call(null, vec__3386, 0, null);
+      var v = cljs.core.nth.call(null, vec__3386, 1, null);
+      var G__3387_3389 = k;
+      if(cljs.core._EQ_.call(null, "\ufdd0'style", G__3387_3389)) {
+        node.setAttribute(cljs.core.name.call(null, k), dommy.template.style_str.call(null, v))
+      }else {
+        if(cljs.core._EQ_.call(null, "\ufdd0'classes", G__3387_3389)) {
+          var G__3388_3390 = cljs.core.seq.call(null, v);
+          while(true) {
+            if(G__3388_3390) {
+              var c_3391 = cljs.core.first.call(null, G__3388_3390);
+              dommy.template.add_class_BANG_.call(null, node, c_3391);
+              var G__3392 = cljs.core.next.call(null, G__3388_3390);
+              G__3388_3390 = G__3392;
+              continue
+            }else {
+            }
+            break
+          }
+        }else {
+          if(cljs.core._EQ_.call(null, "\ufdd0'class", G__3387_3389)) {
+            dommy.template.add_class_BANG_.call(null, node, v)
+          }else {
+            if("\ufdd0'else") {
+              node.setAttribute(cljs.core.name.call(null, k), v)
+            }else {
+            }
+          }
+        }
+      }
+      var G__3393 = cljs.core.next.call(null, G__3385);
+      G__3385 = G__3393;
+      continue
+    }else {
+      return null
+    }
+    break
+  }
+};
+dommy.template.next_css_index = function next_css_index(s, start_idx) {
+  var id_idx = s.indexOf("#", start_idx);
+  var class_idx = s.indexOf(".", start_idx);
+  var idx = Math.min(id_idx, class_idx);
+  if(idx < 0) {
+    return Math.max(id_idx, class_idx)
+  }else {
+    return idx
+  }
+};
+dommy.template.base_element = function base_element(node_key) {
+  var node_str = cljs.core.name.call(null, node_key);
+  var base_idx = dommy.template.next_css_index.call(null, node_str, 0);
+  var tag = base_idx > 0 ? node_str.substring(0, base_idx) : node_str;
+  var node = document.createElement(tag);
+  if(base_idx >= 0) {
+    var str_3396 = node_str.substring(base_idx);
+    while(true) {
+      var next_idx_3397 = dommy.template.next_css_index.call(null, str_3396, 1);
+      var frag_3398 = next_idx_3397 >= 0 ? str_3396.substring(0, next_idx_3397) : str_3396;
+      var G__3395_3399 = frag_3398.charAt(0);
+      if(cljs.core._EQ_.call(null, "#", G__3395_3399)) {
+        node.setAttribute("id", frag_3398.substring(1))
+      }else {
+        if(cljs.core._EQ_.call(null, ".", G__3395_3399)) {
+          dommy.template.add_class_BANG_.call(null, node, frag_3398.substring(1))
+        }else {
+          if("\ufdd0'else") {
+            throw new Error([cljs.core.str("No matching clause: "), cljs.core.str(frag_3398.charAt(0))].join(""));
+          }else {
+          }
+        }
+      }
+      if(next_idx_3397 >= 0) {
+        var G__3400 = str_3396.substring(next_idx_3397);
+        str_3396 = G__3400;
+        continue
+      }else {
+      }
+      break
+    }
+  }else {
+  }
+  return node
+};
+dommy.template.element_QMARK_ = function element_QMARK_(data) {
+  var or__3962__auto__ = cljs.core.keyword_QMARK_.call(null, data);
+  if(or__3962__auto__) {
+    return or__3962__auto__
+  }else {
+    var or__3962__auto____$1 = function() {
+      var and__3960__auto__ = cljs.core.coll_QMARK_.call(null, data);
+      if(and__3960__auto__) {
+        return cljs.core.keyword_QMARK_.call(null, cljs.core.first.call(null, data))
+      }else {
+        return and__3960__auto__
+      }
+    }();
+    if(cljs.core.truth_(or__3962__auto____$1)) {
+      return or__3962__auto____$1
+    }else {
+      return cljs.core.instance_QMARK_.call(null, HTMLElement, data)
+    }
+  }
+};
+dommy.template.node_QMARK_ = function node_QMARK_(data) {
+  var or__3962__auto__ = dommy.template.element_QMARK_.call(null, data);
+  if(cljs.core.truth_(or__3962__auto__)) {
+    return or__3962__auto__
+  }else {
+    var or__3962__auto____$1 = cljs.core.string_QMARK_.call(null, data);
+    if(or__3962__auto____$1) {
+      return or__3962__auto____$1
+    }else {
+      var or__3962__auto____$2 = cljs.core.number_QMARK_.call(null, data);
+      if(or__3962__auto____$2) {
+        return or__3962__auto____$2
+      }else {
+        return cljs.core.instance_QMARK_.call(null, Text, data)
+      }
+    }
+  }
+};
+dommy.template.compound_element = function compound_element(data) {
+  var n = dommy.template.base_element.call(null, cljs.core.first.call(null, data));
+  var attrs = cljs.core.map_QMARK_.call(null, cljs.core.second.call(null, data)) ? cljs.core.second.call(null, data) : null;
+  var tail = cljs.core.drop.call(null, cljs.core.truth_(attrs) ? 2 : 1, data);
+  var tail__$1 = cljs.core.mapcat.call(null, function(group) {
+    if(cljs.core.truth_(dommy.template.node_QMARK_.call(null, group))) {
+      return cljs.core.PersistentVector.fromArray([group], true)
+    }else {
+      return group
+    }
+  }, tail);
+  if(cljs.core.truth_(attrs)) {
+    dommy.template.add_attrs_BANG_.call(null, n, attrs)
+  }else {
+  }
+  var G__3402_3403 = cljs.core.seq.call(null, tail__$1);
+  while(true) {
+    if(G__3402_3403) {
+      var child_3404 = cljs.core.first.call(null, G__3402_3403);
+      n.appendChild(dommy.template.node.call(null, child_3404));
+      var G__3405 = cljs.core.next.call(null, G__3402_3403);
+      G__3402_3403 = G__3405;
+      continue
+    }else {
+    }
+    break
+  }
+  return n
+};
+dommy.template.element = function element(data) {
+  if(cljs.core.keyword_QMARK_.call(null, data)) {
+    return dommy.template.base_element.call(null, data)
+  }else {
+    if(function() {
+      var and__3960__auto__ = cljs.core.coll_QMARK_.call(null, data);
+      if(and__3960__auto__) {
+        return cljs.core.keyword_QMARK_.call(null, cljs.core.first.call(null, data))
+      }else {
+        return and__3960__auto__
+      }
+    }()) {
+      return dommy.template.compound_element.call(null, data)
+    }else {
+      if(cljs.core.instance_QMARK_.call(null, HTMLElement, data)) {
+        return data
+      }else {
+        if("\ufdd0'else") {
+          throw[cljs.core.str("Don't know how to make element from "), cljs.core.str(cljs.core.pr_str.call(null, data))].join("");
+        }else {
+          return null
+        }
+      }
+    }
+  }
+};
+dommy.template.node = function node(data) {
+  if(cljs.core.truth_(dommy.template.element_QMARK_.call(null, data))) {
+    return dommy.template.element.call(null, data)
+  }else {
+    if(function() {
+      var or__3962__auto__ = cljs.core.number_QMARK_.call(null, data);
+      if(or__3962__auto__) {
+        return or__3962__auto__
+      }else {
+        return cljs.core.string_QMARK_.call(null, data)
+      }
+    }()) {
+      return document.createTextNode([cljs.core.str(data)].join(""))
+    }else {
+      if(cljs.core.instance_QMARK_.call(null, Text, data)) {
+        return data
+      }else {
+        if("\ufdd0'else") {
+          throw[cljs.core.str("Don't know how to make node from "), cljs.core.str(cljs.core.pr_str.call(null, data))].join("");
+        }else {
+          return null
+        }
+      }
+    }
+  }
+};
+dommy.template.html__GT_nodes = function html__GT_nodes(html) {
+  var parent = document.createElement("div");
+  parent.insertAdjacentHTML("beforeend", html);
+  return Array.prototype.slice.call(parent.childNodes)
+};
 goog.provide("goog.dom.ViewportSizeMonitor");
 goog.require("goog.dom");
 goog.require("goog.events");
@@ -35456,43 +35691,43 @@ Text.prototype.domina$DomContent$single_node$arity$1 = function(content) {
 };
 goog.provide("clj_chan.client.board");
 goog.require("cljs.core");
+goog.require("dommy.template");
 goog.require("enfocus.core");
 goog.require("clj_chan.client.utils");
 goog.require("clj_chan.client.web_socket");
 clj_chan.client.board.gen_post_html = function gen_post_html(post) {
-  return[cljs.core.str('<div><div class="post-author">'), cljs.core.str((new cljs.core.Keyword("\ufdd0'author")).call(null, post)), cljs.core.str("</div>"), cljs.core.str('<div class="post-content">'), cljs.core.str((new cljs.core.Keyword("\ufdd0'content")).call(null, post)), cljs.core.str("<hr></div></div>")].join("")
+  var map__4947 = post;
+  var map__4947__$1 = cljs.core.seq_QMARK_.call(null, map__4947) ? cljs.core.apply.call(null, cljs.core.hash_map, map__4947) : map__4947;
+  var author = cljs.core._lookup.call(null, map__4947__$1, "\ufdd0'author", null);
+  var image = cljs.core._lookup.call(null, map__4947__$1, "\ufdd0'image", null);
+  var text = cljs.core._lookup.call(null, map__4947__$1, "\ufdd0'text", null);
+  return dommy.template.node.call(null, cljs.core.PersistentVector.fromArray(["\ufdd0'div.post", cljs.core.PersistentVector.fromArray(["\ufdd0'div.post-author", author], true), cljs.core.PersistentVector.fromArray(["\ufdd0'div.post-image", cljs.core.PersistentVector.fromArray(["\ufdd0'a", cljs.core.ObjMap.fromObject(["\ufdd0'href", "\ufdd0'target"], {"\ufdd0'href":image, "\ufdd0'target":"_blank"}), cljs.core.PersistentVector.fromArray(["\ufdd0'img", cljs.core.ObjMap.fromObject(["\ufdd0'src", "\ufdd0'alt"], 
+  {"\ufdd0'src":image, "\ufdd0'alt":"some pic"})], true)], true)], true), cljs.core.PersistentVector.fromArray(["\ufdd0'div.post-text", text], true), cljs.core.PersistentVector.fromArray(["\ufdd0'hr"], true)], true))
 };
 clj_chan.client.board.show_post = function show_post(post) {
   return enfocus.core.at.call(null, document, cljs.core.PersistentVector.fromArray(["div#posts > div#post-anchor"], true), enfocus.core.en_after.call(null, clj_chan.client.board.gen_post_html.call(null, post)))
 };
 clj_chan.client.board.read_new_post_data = function read_new_post_data() {
-  return enfocus.core.from.call(null, document, "\ufdd0'author", cljs.core.PersistentVector.fromArray(["#new-post #new-author"], true), enfocus.core.extr_multi_node.call(null, function(pnod__3248__auto__) {
-    return pnod__3248__auto__.value
-  }), "\ufdd0'content", cljs.core.PersistentVector.fromArray(["#new-post #new-content"], true), enfocus.core.extr_multi_node.call(null, function(pnod__3248__auto__) {
-    return pnod__3248__auto__.value
-  }))
+  var post = enfocus.core.from.call(null, document, "\ufdd0'author", cljs.core.PersistentVector.fromArray(["#new-post #new-author"], true), enfocus.core.extr_multi_node.call(null, function(pnod__3264__auto__) {
+    return pnod__3264__auto__.value
+  }), "\ufdd0'image", cljs.core.PersistentVector.fromArray(["#new-post #new-image"], true), enfocus.core.extr_multi_node.call(null, function(pnod__3264__auto__) {
+    return pnod__3264__auto__.value
+  }), "\ufdd0'text", cljs.core.PersistentVector.fromArray(["#new-post #new-text"], true), enfocus.core.extr_multi_node.call(null, function(pnod__3264__auto__) {
+    return pnod__3264__auto__.value
+  }));
+  return cljs.core.into.call(null, cljs.core.ObjMap.EMPTY, cljs.core.filter.call(null, function(p1__4948_SHARP_) {
+    return cljs.core.not.call(null, cljs.core.comp.call(null, cljs.core.empty_QMARK_, cljs.core.second).call(null, p1__4948_SHARP_))
+  }, post))
 };
 clj_chan.client.board.setup = function setup() {
   return enfocus.core.at.call(null, document, cljs.core.PersistentVector.fromArray(["#post-submit"], true), enfocus.core.en_listen.call(null, "\ufdd0'click", function() {
-    return clj_chan.client.web_socket.send_post.call(null, cljs.core.PersistentVector.fromArray([clj_chan.client.board.read_new_post_data.call(null)], true))
+    return clj_chan.client.web_socket.send_post.call(null, clj_chan.client.board.read_new_post_data.call(null))
   }))
 };
 clj_chan.client.board.start = function start() {
   clj_chan.client.web_socket.init_ws.call(null, clj_chan.client.web_socket.ws, cljs.core.assoc.call(null, clj_chan.client.web_socket.ws_handlers, "\ufdd0'onmessage", function(i) {
-    var posts = clj_chan.client.web_socket.decode_posts.call(null, i);
-    var G__3731 = cljs.core.seq.call(null, posts);
-    while(true) {
-      if(G__3731) {
-        var post = cljs.core.first.call(null, G__3731);
-        clj_chan.client.board.show_post.call(null, post);
-        var G__3732 = cljs.core.next.call(null, G__3731);
-        G__3731 = G__3732;
-        continue
-      }else {
-        return null
-      }
-      break
-    }
+    var post = clj_chan.client.web_socket.decode_post.call(null, i);
+    return clj_chan.client.board.show_post.call(null, post)
   }));
   return clj_chan.client.board.setup.call(null)
 };
