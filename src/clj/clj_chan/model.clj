@@ -31,7 +31,7 @@ Post instances."))
     (keys @posts-atom))
   (add-post [self topic post]
     (let [{:keys [author image text]
-           :or {author "Anon" text "sth" image "/image/no.png"}} post
+           :or {author "Anon" text "sth" image ""}} post
           post (->Post (str (java.util.UUID/randomUUID))
                        author (java.util.Date.) image text)]
       (swap! posts-atom update-in [topic] #(conj % post))

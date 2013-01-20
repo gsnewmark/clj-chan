@@ -5,6 +5,15 @@
             [clojure.string :as s]))
 
 
+;; ## Web socket connection
+
+(defn ws
+  "Opens a new connection to a websocket that corresponds to a current page."
+  []
+  (js/WebSocket.
+   ;; TODO remove request parameters (all after ? in location)
+   (s/replace-first (str (.-location js/window)) #"[^/]+" "ws:")))
+
 (defn init-ws
   "Adds event handlers to a web socket from a map keys of which correspond
 to names of event handlers (JS web socket API)."
@@ -17,18 +26,11 @@ to names of event handlers (JS web socket API)."
   (r/read-string (.-data post-event)))
 
 (defn send-post
-  [post]
+  [ws post]
   (.send ws (pr-str post)))
 
 (def ws-handlers
   {:onopen    #(u/log "Connection established.")
    :onclose   #(u/log "Connection closed.")
-   :onmessage (fn [i] (let [posts (decode-posts i)] (u/log (.-data i))))
+   :onmessage (fn [i] (let [posts (decode-post i)] (u/log (.-data i))))
    :onerror   #(u/log (str "Something bad happened:" %))})
-
-;; ## Web socket connection
-
-(def ws (js/WebSocket.
-         (s/replace-first (str (.-location js/window)) #"[^/]+" "ws:")))
-
-

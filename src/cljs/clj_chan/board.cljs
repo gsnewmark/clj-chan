@@ -14,8 +14,9 @@
     [:div.post
      [:div.post-author author]
      [:div.post-image
-      [:a {:href image :target "_blank"}
-       [:img {:src image :alt "some pic"}]]]
+      (when (seq image)
+        [:a {:href image :target "_blank"}
+         [:img {:src image :alt "some pic"}]])]
      [:div.post-text text]
      [:hr]])))
 
@@ -33,15 +34,18 @@
                       :text ["#new-post #new-text"] (em/get-prop :value))]
     (into {} (filter #(not ((comp empty? second) %)) post))))
 
-(em/defaction setup []
+(em/defaction setup [ws]
   ["#post-submit"]
-  (em/listen :click #(socket/send-post (read-new-post-data))))
+  (em/listen :click #(socket/send-post ws (read-new-post-data))))
 
 (defn start []
-  (socket/init-ws socket/ws
-                  (assoc socket/ws-handlers :onmessage
-                         (fn [i] (let [post (socket/decode-post i)]
-                                  (show-post post)))))
-  (setup))
+  (let [ws (socket/ws)]
+    (socket/init-ws ws
+                    (assoc socket/ws-handlers :onmessage
+                           (fn [i] (let [post (socket/decode-post i)]
+                                    (show-post post)))))
+    (setup ws)))
 
 (set! (.-onload js/window) #(start))
+
+

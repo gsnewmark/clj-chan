@@ -55,9 +55,13 @@ connection for a specific board."
   "HTML base for a specific board."
   [topic]
   (hp/html5
-   [:head [:title (str "Best chan ever - /" topic)]]
+   [:head
+    [:title (str "Best chan ever - /" topic)]
+    (hp/include-css (str "http://fonts.googleapis.com/css?"
+                         "family=Press+Start+2P&subset=latin,cyrillic"))
+    (hp/include-css "/css/board.css")
+    (hp/include-js "/js/board.js")]
    [:body
-    (hp/include-js "/js/board.js")
     [:header (str "/" topic)]
     [:div#new-post
      [:div
