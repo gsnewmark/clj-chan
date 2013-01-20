@@ -28,7 +28,7 @@ connection for a specific board."
 (defn board-websocket-handler
   "Initializes and opens a web socket for a specific board."
   [board-db ch topic]
-  (let [board (lc/named-channel topic board-init)
+  (let [board (lc/named-channel topic (partial board-init topic))
         posts (model/get-posts board-db topic)]
     (model/add-topic board-db topic)
     ;; send already present posts to user
@@ -39,8 +39,8 @@ connection for a specific board."
      board)
     (lc/siphon board ch)))
 
-(defn board-init [ch]
-  (lc/receive-all ch #(println %)))
+(defn board-init [topic ch]
+  (lc/receive-all ch #(println topic %)))
 
 ;; ## HTML
 

@@ -3,7 +3,8 @@
             [clj-chan.board-handler :as board-handler]
             [compojure.core :as c]
             [compojure.route :as r]
-            [aleph.http :as ah]))
+            [aleph.http :as ah])
+  (:gen-class))
 
 
 (def board-db (model/->MortalBoard (atom {})))
