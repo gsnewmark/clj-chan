@@ -1,5 +1,6 @@
 (ns clj-chan.server
-  (:require [clj-chan.model :as model]
+  (:require [clj-chan.config :as conf]
+            [clj-chan.data-source :as ds]
             [clj-chan.board-handler :as board-handler]
             [compojure.core :as c]
             [compojure.route :as r]
@@ -7,7 +8,7 @@
   (:gen-class))
 
 
-(def board-db (model/->MortalBoard (atom {})))
+(def board-db (ds/->InMemoryBoard (atom {})))
 
 (c/defroutes app
   (c/GET
@@ -20,5 +21,19 @@
   (-> app
       ah/wrap-ring-handler))
 
+;; TODO find a way to propagate settings to app
+;; possibly use c/routes and not c/defroutes
+(defn start-server
+  [settings]
+  (let [{:keys [port]} (merge conf/default-config settings)]
+    (ah/start-http-server #(wrapped-app %1 %2)
+                          {:port port :websocket true})))
+
 (defn -main [& args]
-  (ah/start-http-server #(wrapped-app %1 %2) {:port 1337 :websocket true}))
+  (start-server {}))
+
+
+
+
+
+

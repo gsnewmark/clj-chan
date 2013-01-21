@@ -1,11 +1,12 @@
-(ns clj-chan.model
-  "Describes basic entities of a chan and function on them.")
+(ns clj-chan.data-source
+  "Describes interactions with basic imageboard entities (board, topic
+post).")
 
-
-;; ## Abstraction
 
 ;; Post on a board.
 (defrecord Post [id author date image text])
+
+;; ## DB protocols
 
 ;; TODO create few separate protocols
 (defprotocol BoardDAO
@@ -23,7 +24,7 @@ Post instances."))
 ;; ## In-memory 'DB' implementation
 
 ;; Stores a list of posts in an atom.
-(defrecord MortalBoard [posts-atom]
+(defrecord InMemoryBoard [posts-atom]
   BoardDAO
   (add-topic [self topic]
     (when-not (get @posts-atom topic)

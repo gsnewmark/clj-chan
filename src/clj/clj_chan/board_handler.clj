@@ -1,5 +1,5 @@
 (ns clj-chan.board-handler
-  (:require [clj-chan.model :as model]
+  (:require [clj-chan.data-source :as ds]
             [hiccup.page :as hp]
             [hiccup.form :as hf]
             [lamina.core :as lc]))
@@ -29,13 +29,14 @@ connection for a specific board."
   "Initializes and opens a web socket for a specific board."
   [board-db ch topic]
   (let [board (lc/named-channel topic (partial board-init topic))
-        posts (model/get-posts board-db topic)]
-    (model/add-topic board-db topic)
+        posts (ds/get-posts board-db topic)]
+    (ds/add-topic board-db topic)
     ;; send already present posts to user
+    ;; TODO shouldn't do this when pagination will be present
     (when (seq posts)
       (apply lc/enqueue ch (map (comp pr-str (partial into {})) posts)))
     (lc/siphon
-     (lc/map* #(pr-str (model/add-post board-db topic (read-string %))) ch)
+     (lc/map* #(pr-str (ds/add-post board-db topic (read-string %))) ch)
      board)
     (lc/siphon board ch)))
 
