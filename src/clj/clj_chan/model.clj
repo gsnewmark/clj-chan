@@ -7,6 +7,7 @@
 ;; Post on a board.
 (defrecord Post [id author date image text])
 
+;; TODO create few separate protocols
 (defprotocol BoardDAO
   "Describes an interface to a chan's board - collection of posts."
   (add-topic [self topic]
@@ -31,7 +32,8 @@ Post instances."))
     (keys @posts-atom))
   (add-post [self topic post]
     (let [{:keys [author image text]
-           :or {author "Anon" text "sth" image ""}} post
+           :or {author "Anon" text "" image ""}} post
+          text (if (and (empty? text) (empty? image)) "sth" text)
           post (->Post (str (java.util.UUID/randomUUID))
                        author (java.util.Date.) image text)]
       (swap! posts-atom update-in [topic] #(conj % post))
