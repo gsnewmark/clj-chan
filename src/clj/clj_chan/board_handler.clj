@@ -45,6 +45,17 @@ connection for a specific board."
 
 ;; ## HTML
 
+(def login-view
+  (hp/html5
+   [:head [:title "login"]]
+   [:body
+    (hf/form-to [:post "/login"]
+                (hf/text-field "username" "username")
+                (hf/text-field "password" "password")
+                (hf/submit-button "login"))]))
+
+
+;; TODO i think this is unneeded, could supply the board-view itself
 (defn board-html-handler
   "Renders an HTML page for a specific board."
   [request]

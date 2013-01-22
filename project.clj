@@ -7,6 +7,7 @@
                  [compojure            "1.1.3"]
                  [hiccup               "1.0.2"]
                  [aleph                "0.3.0-SNAPSHOT"]
+                 [com.cemerick/friend  "0.1.3"]
                  [enfocus              "1.0.0-beta2"]
                  [prismatic/dommy      "0.0.1"]]
   :main         clj-chan.server
