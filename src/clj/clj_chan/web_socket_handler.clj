@@ -14,7 +14,7 @@
 atom with currently existing connection."
   [db channels]
   (proxy [WebSocketHandler] []
-    (onOpen [c] ((swap! channels conj c)))
+    (onOpen [c] (swap! channels conj c))
     (onClose [c] (swap! channels disj c))
     ;; TODO refactor this - should be multi-method (maybe protocol)
     (onMessage [c m] (let [message (read-string m)
