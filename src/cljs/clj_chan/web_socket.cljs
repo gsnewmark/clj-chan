@@ -10,9 +10,7 @@
 (defn ws
   "Opens a new connection to a websocket that corresponds to a current page."
   []
-  (js/WebSocket.
-   ;; TODO remove request parameters (all after ? in location)
-   (s/replace-first (str (.-location js/window)) #"[^/]+" "ws:")))
+  (js/WebSocket. "ws://localhost:1338/websocket"))
 
 (defn init-ws
   "Adds event handlers to a web socket from a map keys of which correspond
@@ -25,12 +23,12 @@ to names of event handlers (JS web socket API)."
   [post-event]
   (r/read-string (.-data post-event)))
 
-(defn send-post
-  [ws post]
-  (.send ws (pr-str post)))
+(defn send-message
+  [ws message]
+  (.send ws (pr-str message)))
 
 (def ws-handlers
-  {:onopen    #(u/log "Connection established.")
-   :onclose   #(u/log "Connection closed.")
+  {:onopen #(u/log "Connection established.")
+   :onclose #(u/log "Connection closed.")
    :onmessage (fn [i] (let [posts (decode-post i)] (u/log (.-data i))))
-   :onerror   #(u/log (str "Something bad happened:" %))})
+   :onerror #(u/log (str "Something bad happened:" %))})

@@ -36,14 +36,28 @@
 
 (em/defaction setup [ws]
   ["#post-submit"]
-  (em/listen :click #(socket/send-post ws (read-new-post-data))))
+  (em/listen
+   :click #(socket/send-message ws
+                                (merge
+                                 ;; TODO fix this (send actual topic, not all
+                                 ;; path
+                                 {:topic (.-pathname (.-location js/window))
+                                  :action :post}
+                                 {:post (read-new-post-data)}))))
 
 (defn start []
   (let [ws (socket/ws)]
     (socket/init-ws ws
-                    (assoc socket/ws-handlers :onmessage
-                           (fn [i] (let [post (socket/decode-post i)]
-                                    (show-post post)))))
+                    (assoc socket/ws-handlers
+                      :onopen
+                      (fn []
+                        (socket/send-message
+                         ws
+                         {:topic (.-pathname (.-location js/window))
+                          :action :init}))
+                      :onmessage
+                      (fn [i] (let [post (socket/decode-post i)]
+                               (show-post post)))))
     (setup ws)))
 
 (set! (.-onload js/window) #(start))

@@ -12,6 +12,10 @@ body {
   color: @hacky-green;
   input, textarea {
     font-family: 'Press Start 2P', cursive;
+    font-size: 1em;
+    background: @light-grey;
+    color: @hacky-green;
+    border-color: black;
   }
 }
 
@@ -21,16 +25,13 @@ header {
 
 #new-post {
   label {
-    width: 30%;
+    width: 20%;
     float: left;
     text-align: left;
   }
 
-  #new-author, #new-image, #new-text, #post-submit {
-    font-size: 1em;
-    background: @light-grey;
-    color: @hacky-green;
-    border-color: black;
+  #new-author, #new-image, #new-text {
+      width: 33%;
   }
 }
 
@@ -40,8 +41,5 @@ header {
       max-width: 33%;
       max-height: 33%;
     }
-  }
-  .post-author .post-text {
-
   }
 }

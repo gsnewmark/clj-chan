@@ -5,7 +5,7 @@ A simple imageboard with dynamic post loading.
 Server is implemented in Clojure, client - in Clojurescript. Communications
 are done through a WebSocket connection.
 
-[Aleph](https://github.com/ztellman/aleph) is used for the server-side
+[Webbit](https://github.com/webbit/webbit) is used for the server-side
 WebSocket handling.
 
 ## Installation
