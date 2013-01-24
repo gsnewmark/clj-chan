@@ -23,14 +23,14 @@ compiler).
 
         lein uberjar
 
-This will create runnable jar called `clj-chan-0.1.0-SNAPSHOT-standalone.jar`
+This will create runnable jar called `clj-chan-0.1.4-SNAPSHOT-standalone.jar`
 in a `<checkout_dir>/targer` directory.
 
 ## Usage
 
 If you created jar, run
 
-        java -jar clj-chan-0.1.0-SNAPSHOT-standalone.jar
+        java -jar clj-chan-0.1.4-SNAPSHOT-standalone.jar
 
 Or simply execute `lein run` in a `<checkout_dir>`.
 

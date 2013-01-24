@@ -10,7 +10,9 @@
 (defn ws
   "Opens a new connection to a websocket that corresponds to a current page."
   []
-  (js/WebSocket. "ws://localhost:1338/websocket"))
+  (js/WebSocket.
+   ;; TODO read port from config
+   (str "ws://" (.-hostname (.-location js/window)) ":1338/websocket")))
 
 (defn init-ws
   "Adds event handlers to a web socket from a map keys of which correspond

@@ -1,4 +1,4 @@
-(defproject clj-chan "0.1.0-SNAPSHOT"
+(defproject clj-chan "0.1.4-SNAPSHOT"
   :description "Simple imageboard."
   :url "https://github.com/gsnewmark/clj-chan"
   :license {:name "Eclipse Public License"
