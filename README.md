@@ -5,7 +5,7 @@ A simple imageboard with dynamic post loading.
 Server is implemented in Clojure, client - in Clojurescript. Communications
 are done through a WebSocket connection.
 
-[Webbit](https://github.com/webbit/webbit) is used for the server-side
+[http-kit](http://http-kit.org/index.html) is used for the server-side
 WebSocket handling.
 
 ## Installation
@@ -23,14 +23,14 @@ compiler).
 
         lein uberjar
 
-This will create runnable jar called `clj-chan-0.1.4-SNAPSHOT-standalone.jar`
+This will create runnable jar called `clj-chan-0.1.8-SNAPSHOT-standalone.jar`
 in a `<checkout_dir>/targer` directory.
 
 ## Usage
 
 If you created jar, run
 
-        java -jar clj-chan-0.1.4-SNAPSHOT-standalone.jar
+        java -jar clj-chan-0.1.8-SNAPSHOT-standalone.jar
 
 Or simply execute `lein run` in a `<checkout_dir>`.
 

@@ -1,4 +1,4 @@
-(defproject clj-chan "0.1.4-SNAPSHOT"
+(defproject clj-chan "0.1.8-SNAPSHOT"
   :description "Simple imageboard."
   :url "https://github.com/gsnewmark/clj-chan"
   :license {:name "Eclipse Public License"
@@ -8,8 +8,7 @@
                  [hiccup "1.0.2"]
                  [com.cemerick/friend "0.1.3"]
                  [com.novemberain/monger "1.4.2"]
-                 [ring/ring-jetty-adapter "1.1.8"]
-                 [org.webbitserver/webbit "0.4.6"]
+                 [http-kit "2.0-rc1"]
                  [enfocus "1.0.0-beta2"]
                  [prismatic/dommy "0.0.1"]]
   :main         clj-chan.server

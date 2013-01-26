@@ -4,8 +4,6 @@
 
 (def default-config
   {:port 1337
-   :ws-port 1338
-   :ws-path "/websocket"
    ;; TODO read from system env properties
    :db-connection-string "mongodb://root:root@127.0.0.1/chan"
    ;; TODO shoudln't be here
