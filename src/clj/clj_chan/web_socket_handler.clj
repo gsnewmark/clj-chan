@@ -5,7 +5,9 @@
   (:import [org.webbitserver WebServer WebServers WebSocketHandler]))
 
 
-(def board-db (ds/->InMemoryBoard (atom {})))
+(def board-db
+  (ds/->MongoDBBoard
+   (ds/get-mongo-db (:db-connection-string conf/default-config))))
 
 (defn generate-ws-handler
   "Generates a Webbit web socket handler which uses a given DB object and
@@ -36,7 +38,7 @@ atom with currently existing subscriptions (topic - connection)."
                 (ds/add-topic db topic))
               (swap! subscriptions update-in [topic] #(into #{} (conj % c)))
               (doseq [p (ds/get-posts db topic)]
-                (.send c ((comp pr-str (partial into {})) p))))))))))
+                (.send c (pr-str p))))))))))
 
 (defn generate-server
   "Generates a Webbit server with given parameters."

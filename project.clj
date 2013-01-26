@@ -7,6 +7,7 @@
                  [compojure "1.1.3"]
                  [hiccup "1.0.2"]
                  [com.cemerick/friend "0.1.3"]
+                 [com.novemberain/monger "1.4.2"]
                  [ring/ring-jetty-adapter "1.1.8"]
                  [org.webbitserver/webbit "0.4.6"]
                  [enfocus "1.0.0-beta2"]

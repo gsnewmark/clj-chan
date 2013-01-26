@@ -1,29 +1,50 @@
 (ns clj-chan.data-source
   "Describes interactions with basic imageboard entities (board, topic
-post).")
+post)."
+  (:require [monger.core :as mg]
+            [monger.collection :as mgc])
+  (:import [org.bson.types ObjectId]
+           [com.mongodb WriteConcern]))
 
-
-;; Post on a board.
-(defrecord Post [id author date image text])
 
 ;; ## DB protocols
 
 ;; TODO create few separate protocols
+;; (something like db-reader, db-writer, db-maintenance (init/close)...)
 (defprotocol BoardDAO
   "Describes an interface to a chan's board - collection of posts."
   (add-topic [self topic]
-    "Adds a new topic to board.")
+    "Adds a new topic (specified by name) to board.")
   (topic-exists? [self topic]
-    "Checks whether the board has the given topic.")
+    "Checks whether the board has the given topic (specified by name).")
   (get-topics [self]
-    "Returns all existing topics on board.")
+    "Returns all existing topics on board (set of their names).")
   (add-post [self topic post]
-    "Adds a new post to a board's topic.")
+    "Adds a new post (map with optional keys :author, :image, :text to a
+board's topic (specified by name).")
   (get-posts [self topic]
-    "Returns all posts from a board's topic in a form of list of
-Post instances."))
+    "Returns all posts from a board's topic (specified by name) in a form of
+list of map instances.
 
-;; ## In-memory 'DB' implementation
+Each post contains keys :author, :date, :image, :text."))
+
+;; ## Shared utils
+
+(defn create-post
+  "Creates a post in a given topic using the given function.
+
+Post given to a savefn is a map with keys :_id, :author, :date, :image and
+:text. Returns the same map, but without the :_id."
+  [topic post save-fn]
+  (let [{:keys [author image text]
+         :or {author "Anon" text "" image ""}} post
+        text (if (and (empty? text) (empty? image)) "sth" text)
+        post {:_id (ObjectId.) :author author :date (java.util.Date.)
+              :image image :text text}]
+    (save-fn post)
+    (dissoc post :_id)))
+
+;; ## In-memory data source
 
 ;;  atom with map {:topic [post_1 ... post_n]}.
 (defrecord InMemoryBoard [posts-atom]
@@ -32,17 +53,37 @@ Post instances."))
     (when-not (get @posts-atom topic)
       (swap! posts-atom assoc topic [])))
   (get-topics [self]
-    (keys @posts-atom))
+    (into #{} (keys @posts-atom)))
   (topic-exists? [self topic]
     (contains? @posts-atom topic))
   (add-post [self topic post]
-    (let [{:keys [author image text]
-           :or {author "Anon" text "" image ""}} post
-          text (if (and (empty? text) (empty? image)) "sth" text)
-          post (->Post (str (java.util.UUID/randomUUID))
-                       author (java.util.Date.) image text)]
-      ;; TODO maybe ensure that post is added at the end
-      (swap! posts-atom update-in [topic] #(conj % post))
-      (into {} post)))
+    (create-post topic post
+                 #(swap! posts-atom update-in [topic] (fn [ps] (conj ps %)))))
   (get-posts [self topic]
-    (get @posts-atom topic [])))
+    (map #(dissoc % :_id) (get @posts-atom topic []))))
+
+;; ## MongoDB data source
+
+(defn get-mongo-db
+  "Connects to a MongoDB instance and returns it."
+  [connection-string]
+  (mg/get-db (mg/connect-via-uri! connection-string) "chan"))
+
+(defrecord MongoDBBoard [db]
+  BoardDAO
+  (add-topic [self topic]
+    (when-not (topic-exists? self topic)
+      (mgc/insert-and-return db "topics"
+                             {:_id (ObjectId.) :name topic :posts []}
+                             WriteConcern/SAFE)))
+  (get-topics [self]
+    (into #{} (map :name (mgc/find-maps db "topics" {} [:name]))))
+  (topic-exists? [self topic]
+    (contains? (get-topics self) topic))
+  (add-post [self topic post]
+    (create-post topic post
+                 #(mgc/update "topics" {:name topic} {"$push" {:posts %}})))
+  (get-posts [self topic]
+    (if-let [posts (first (mgc/find-maps db "topics" {:name topic} [:posts]))]
+      (map (comp #(dissoc % :_id) (partial into {})) (:posts posts))
+      [])))
