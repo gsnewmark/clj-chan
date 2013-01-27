@@ -1,6 +1,6 @@
 (ns clj-chan.data-source
-  "Describes interactions with basic imageboard entities (board, topic
-post)."
+  "Functions to interact with basic imageboard's entities: board, topic,
+post."
   (:require [monger.core :as mg]
             [monger.collection :as mgc])
   (:import [org.bson.types ObjectId]
@@ -28,7 +28,7 @@ list of map instances.
 
 Each post contains keys :author, :date, :image, :text."))
 
-;; ## Shared utils
+;; ## Common utils
 
 (defn create-post
   "Creates a post in a given topic using the given function.
@@ -49,23 +49,23 @@ Post given to a savefn is a map with keys :_id, :author, :date, :image and
 ;;  atom with map {:topic [post_1 ... post_n]}.
 (defrecord InMemoryBoard [posts-atom]
   BoardDAO
-  (add-topic [self topic]
+  (add-topic [_ topic]
     (when-not (get @posts-atom topic)
       (swap! posts-atom assoc topic [])))
-  (get-topics [self]
+  (get-topics [_]
     (into #{} (keys @posts-atom)))
-  (topic-exists? [self topic]
+  (topic-exists? [_ topic]
     (contains? @posts-atom topic))
-  (add-post [self topic post]
+  (add-post [_ topic post]
     (create-post topic post
                  #(swap! posts-atom update-in [topic] (fn [ps] (conj ps %)))))
-  (get-posts [self topic]
+  (get-posts [_ topic]
     (map #(dissoc % :_id) (get @posts-atom topic []))))
 
 ;; ## MongoDB data source
 
 (defn get-mongo-db
-  "Connects to a MongoDB instance and returns it."
+  "Connects to a MongoDB instance and returns object that represents it."
   [connection-string]
   (mg/get-db (mg/connect-via-uri! connection-string) "chan"))
 
@@ -76,14 +76,14 @@ Post given to a savefn is a map with keys :_id, :author, :date, :image and
       (mgc/insert-and-return db "topics"
                              {:_id (ObjectId.) :name topic :posts []}
                              WriteConcern/SAFE)))
-  (get-topics [self]
+  (get-topics [_]
     (into #{} (map :name (mgc/find-maps db "topics" {} [:name]))))
-  (topic-exists? [self topic]
-    (contains? (get-topics self) topic))
-  (add-post [self topic post]
+  (topic-exists? [_ topic]
+    (mgc/any? db "topics" {:name topic}))
+  (add-post [_ topic post]
     (create-post topic post
                  #(mgc/update "topics" {:name topic} {"$push" {:posts %}})))
-  (get-posts [self topic]
+  (get-posts [_ topic]
     (if-let [posts (first (mgc/find-maps db "topics" {:name topic} [:posts]))]
       (map (comp #(dissoc % :_id) (partial into {})) (:posts posts))
       [])))

@@ -1,4 +1,4 @@
-(ns clj-chan.views
+(ns clj-chan.templates
   "Templates to render basic pages of the imageboard."
   (:require [hiccup.page :as hp]
             [hiccup.form :as hf]))

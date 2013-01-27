@@ -1,5 +1,5 @@
 (ns clj-chan.config
-  "Application's default configuration."
+  "Imageboard's default configuration."
   (:require [cemerick.friend.credentials :as creds]))
 
 (def default-config

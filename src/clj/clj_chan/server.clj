@@ -1,11 +1,12 @@
 (ns clj-chan.server
-  "Entry point of an app."
+  "Entry point of the imageboard - routes are defined here as well as
+server's start function."
   (:require [clj-chan.config :as conf]
             [clj-chan.data-source :as ds]
-            [clj-chan.views :as views]
+            [clj-chan.handlers :as handlers]
             [compojure.core :as c]
-            [compojure.route :as r]
-            [compojure.handler :as h]
+            [compojure.route :as route]
+            [compojure.handler :as ch]
             [org.httpkit.server :as s]
             [cemerick.friend :as friend]
             (cemerick.friend [workflows :as workflows]
@@ -13,72 +14,39 @@
   (:gen-class :main true))
 
 
-(defn topic-handler
-  "Generates a WebSocket+HTTP handler for a topic page. Uses a given data
-base and atom (map) for storing clients' subscriptions to topics."
-  [db subscriptions]
-  (fn [request]
-    (let [{:keys [topic]} (:params request)]
-      (s/if-ws-request
-       request ws-conn
-       ;; TODO should be separate function(s)
-       (do (s/on-mesg
-            ws-conn
-            (fn [m]
-              (let [message (read-string m)
-                    {:keys [topic action]} message]
-                ;; TODO refactor this - should be multi-method (or protocol)
-                (condp = action
-                  :post
-                  (let [post (ds/add-post db topic (:post message))]
-                    (doseq [c (get @subscriptions topic [])]
-                      (s/send-mesg c (pr-str post))))
-                  :init
-                  (do
-                    (when-not (ds/topic-exists? db topic)
-                      (ds/add-topic db topic))
-                    (swap! subscriptions update-in [topic]
-                           #(into #{} (conj % ws-conn)))
-                    (doseq [p (ds/get-posts db topic)]
-                      (s/send-mesg ws-conn (pr-str p))))))))
-           (s/on-close
-            ws-conn
-            (fn [status]
-              (swap!
-               subscriptions
-               (fn [s]
-                 (into
-                  {}
-                  (map #(let [[k v] %]
-                          [k (if (contains? v ws-conn) (disj v ws-conn) v)])
-                       s)))))))
-       (views/board-view topic)))))
+;; ## Ring application
 
-(defn app [db subs]
+(defn app
+  "Generates a Ring-compatible handler for imageboard that uses a given
+database and uses a given atom with map for storing clients' subscriptions
+to topics."
+  [db subs]
   (c/routes
    (c/GET
-    ["/boards/:topic", :topic #"[a-zA-Z0-9_\-]+"] [topic]
-    (friend/authorize
-     #{:user}
-     (topic-handler db subs)))
-   (c/GET "/login" req views/login-view)
-   (friend/logout
-    (c/ANY "/logout" request (ring.util.response/redirect "/login")))
-   (r/resources "/")
-   (r/not-found "Page not found")))
+    ["/boards/:topic", :topic #"[a-zA-Z0-9_\-]+"] []
+    (friend/authorize #{:user} (handlers/topic-handler db subs)))
+   (c/GET "/login" [] handlers/login-handler)
+   (friend/logout (c/ANY "/logout" [] (ring.util.response/redirect "/login")))
+   (route/resources "/")
+   (route/not-found "Page not found")))
 
 (defn wrapped-app
+  "Generates a Ring-compatible handler for imageboard that uses a given
+database and uses a given atom with map for storing clients' subscriptions
+to topics with additional enabled Friend authentication and Compojure site
+middleware. Initial settings are from a specified map."
   [settings db subs]
   (-> (app db subs)
       (friend/authenticate
        {:credential-fn (partial creds/bcrypt-credential-fn (:users settings))
         :workflows [(workflows/interactive-form)]
         :default-landing-uri "/boards/hello"})
-      h/site))
+      ch/site))
 
-;; TODO find a way to propagate settings to app
-;; possibly use c/routes and not c/defroutes
+;; ## Server
+
 (defn start-server
+  "Starts the imageboard with given settings."
   [settings]
   (let [settings (merge conf/default-config settings)
         {:keys [port db-connection-string]} settings]
@@ -90,4 +58,5 @@ base and atom (map) for storing clients' subscriptions to topics."
      {:port port})))
 
 (defn -main [& args]
+  ;; TODO transform args to map
   (start-server {}))
