@@ -23,8 +23,11 @@ to topics."
   [db subs]
   (c/routes
    (c/GET
-    ["/boards/:topic", :topic #"[a-zA-Z0-9_\-]+"] []
-    (friend/authorize #{:user} (handlers/topic-handler db subs)))
+    ["/"] []
+    (friend/authorize #{:user} (handlers/boards-list-handler db)))
+   (c/GET
+    ["/boards/:board", :board #"[a-zA-Z0-9_\-]+"] []
+    (friend/authorize #{:user} (handlers/board-handler db subs)))
    (c/GET "/login" [] handlers/login-handler)
    (friend/logout (c/ANY "/logout" [] (ring.util.response/redirect "/login")))
    (route/resources "/")
@@ -40,7 +43,7 @@ middleware. Initial settings are from a specified map."
       (friend/authenticate
        {:credential-fn (partial creds/bcrypt-credential-fn (:users settings))
         :workflows [(workflows/interactive-form)]
-        :default-landing-uri "/boards/hello"})
+        :default-landing-uri "/"})
       ch/site))
 
 ;; ## Server

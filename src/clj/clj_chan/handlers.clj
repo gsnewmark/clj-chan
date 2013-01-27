@@ -11,16 +11,16 @@ connections."
 ;; Each request is a valid Clojure map with required keys :action and :topic.
 ;; Actions could also use some additional keys.
 ;;
-;; :topic specifies a topic on which page this request was originated.
+;; :topic specifies a board on which page this request was originated.
 ;;
 ;; :action specifies actual action that this request represent. Currently
 ;; supports only two:
 ;;
 ;; 1) :post - adds a message stored in :post key to a data source and sends it
-;; to all clients subscribed to the same topic
+;; to all clients subscribed to the same board
 ;;
 ;; 2) :init - initializes a connection with server, subscribes client to a
-;; specified topic and sends all existing messages in it to subscriber
+;; specified board and sends all existing messages in it to subscriber
 
 (defmulti on-message
   "Responds to a client's WebSocket request based on its :action."
@@ -53,7 +53,7 @@ connection."
 
 (defn generate-on-close
   "Generates a handler for WebSocket close connection event - removes client
-from the current topic subscription.
+from the current board subscription.
 
 Generated handler uses a given database, subscription and WebSocket
 connection."
@@ -63,19 +63,25 @@ connection."
               (into {} (map #(let [[k v] %] [k (disj v ws-conn)]) s)))]
         (swap! subscriptions remove-connection))))
 
-;; ## Topic Handler
+;; ## Board Handler
 
-(defn topic-handler
-  "Generates a WebSocket and HTTP handler for a topic page. Uses a given data
-base and atom (map) for storing clients' subscriptions to topics."
+(defn board-handler
+  "Generates a WebSocket and HTTP handler for a board page. Uses a given data
+base and atom (map) for storing clients' subscriptions to boards."
   [db subscriptions]
   (fn [request]
-    (let [{:keys [topic]} (:params request)]
+    (let [{:keys [board]} (:params request)]
       (s/if-ws-request
        request ws-conn
        (do (s/on-mesg ws-conn (generate-on-message db subscriptions ws-conn))
            (s/on-close ws-conn (generate-on-close db subscriptions ws-conn)))
-       (templates/board-view topic)))))
+       (templates/board-view board)))))
+
+;; ## Boards-list
+
+(defn boards-list-handler
+  [db]
+  (fn [request] (templates/boards-list (ds/get-topics db))))
 
 ;; ## Login Handler
 
